@@ -129,9 +129,9 @@ open class XBRefreshControl: UIControl {
     
     fileprivate func configActivity() {
         if activity == nil {
-            activity = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+            activity = UIActivityIndicatorView(style: .gray)
         }
-        let mask = UIViewAutoresizing.flexibleLeftMargin.union(.flexibleRightMargin)
+        let mask = UIView.AutoresizingMask.flexibleLeftMargin.union(.flexibleRightMargin)
         activity!.autoresizingMask = mask
         activity!.center = CGPoint(x: floor(frame.size.width / 2), y: floor(frame.size.height / 2)) 
         activity!.alpha = 0 
@@ -253,13 +253,13 @@ open class XBRefreshControl: UIControl {
                             }
                             
                             if hasSectionHeaders {
-                                scrollView.contentInset = UIEdgeInsetsMake(min(-offset, kOpenedViewHeight) + originalContentInset.top,originalContentInset.left, originalContentInset.bottom,                                                         originalContentInset.right)
+                                scrollView.contentInset = UIEdgeInsets(top: min(-offset, kOpenedViewHeight) + originalContentInset.top,left: originalContentInset.left, bottom: originalContentInset.bottom,                                                         right: originalContentInset.right)
                             } else {
-                                scrollView.contentInset = UIEdgeInsetsMake(kOpenedViewHeight + originalContentInset.top, originalContentInset.left,originalContentInset.bottom, originalContentInset.right)
+                                scrollView.contentInset = UIEdgeInsets(top: kOpenedViewHeight + originalContentInset.top, left: originalContentInset.left,bottom: originalContentInset.bottom, right: originalContentInset.right)
                             }
                             
                         } else if hasSectionHeaders && didSetInset {
-                                scrollView.contentInset = UIEdgeInsetsMake(-offset + originalContentInset.top, originalContentInset.left,originalContentInset.bottom, originalContentInset.right)
+                            scrollView.contentInset = UIEdgeInsets(top: -offset + originalContentInset.top, left: originalContentInset.left,bottom: originalContentInset.bottom, right: originalContentInset.right)
                         }
                     }
                 } else if hasSectionHeaders {
@@ -318,7 +318,7 @@ open class XBRefreshControl: UIControl {
         
         //Calculate some useful points and values
         let verticalShift = max(0, -((kMaxTopRadius + kMaxBottomRadius + kMaxTopPadding + kMaxBottomPadding) + offset))
-        let distance = min(kMaxDistance, fabs(verticalShift))
+        let distance = min(kMaxDistance, abs(verticalShift))
         let percentage = 1 - (distance / kMaxDistance)
         
         let currentTopPadding = lerp(kMinTopPadding, kMaxTopPadding, percentage)
@@ -333,7 +333,7 @@ open class XBRefreshControl: UIControl {
         } else {
             topOrigin = CGPoint(x: floor(bounds.size.width / 2), y: bounds.size.height + offset + currentTopPadding + currentTopRadius)
             if percentage == 0 {
-                bottomOrigin.y -= (fabs(verticalShift) - kMaxDistance)
+                bottomOrigin.y -= (abs(verticalShift) - kMaxDistance)
                 triggered = true
             }
         }
@@ -387,13 +387,13 @@ open class XBRefreshControl: UIControl {
             
             arrowPath.closeSubpath()
             arrowLayer.path = arrowPath
-            arrowLayer.fillRule = kCAFillRuleEvenOdd
+            arrowLayer.fillRule = CAShapeLayerFillRule.evenOdd
             
             //随着下拉，旋转arrowLayer
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             arrowLayer.transform = CATransform3DIdentity
-            arrowLayer.transform = CATransform3DMakeRotation(percentage*CGFloat(M_PI*2), 0, 0, -1)
+            arrowLayer.transform = CATransform3DMakeRotation(percentage*CGFloat(Double.pi * 2), 0, 0, -1)
             CATransaction.commit()
             
             // Add the highlight shape
@@ -402,7 +402,7 @@ open class XBRefreshControl: UIControl {
             highlightPath.addArc(center: CGPoint(x: topOrigin.x, y: topOrigin.y + 1.25), radius: currentTopRadius, startAngle: CGFloat.pi, endAngle: 0, clockwise: false)
             
             highlightLayer.path = highlightPath
-            highlightLayer.fillRule = kCAFillRuleNonZero
+            highlightLayer.fillRule = CAShapeLayerFillRule.nonZero
             
         } else {
             // Start the shape disappearance animation，隐藏shape layer，显示activity
@@ -410,7 +410,7 @@ open class XBRefreshControl: UIControl {
             let radius = lerp(kMinBottomRadius, kMaxBottomRadius, 0.2)
             let pathMorph = CABasicAnimation(keyPath: "path")
             pathMorph.duration = 0.15
-            pathMorph.fillMode = kCAFillModeForwards
+            pathMorph.fillMode = CAMediaTimingFillMode.forwards
             pathMorph.isRemovedOnCompletion = false
             
             let toPath = CGMutablePath()
@@ -425,7 +425,7 @@ open class XBRefreshControl: UIControl {
             
             let shadowPathMorph = CABasicAnimation(keyPath:"shadowPath")
             shadowPathMorph.duration = 0.15
-            shadowPathMorph.fillMode = kCAFillModeForwards
+            shadowPathMorph.fillMode = CAMediaTimingFillMode.forwards
             shadowPathMorph.isRemovedOnCompletion = false
             shadowPathMorph.toValue = toPath
             shapeLayer.add(shadowPathMorph, forKey: nil)
@@ -434,14 +434,14 @@ open class XBRefreshControl: UIControl {
             shapeAlphaAnimation.duration = 0.1
             shapeAlphaAnimation.beginTime = CACurrentMediaTime() + 0.1
             shapeAlphaAnimation.toValue = NSNumber(value: 0 as Float)
-            shapeAlphaAnimation.fillMode = kCAFillModeForwards
+            shapeAlphaAnimation.fillMode = CAMediaTimingFillMode.forwards
             shapeAlphaAnimation.isRemovedOnCompletion = false
             shapeLayer.add(shapeAlphaAnimation, forKey:nil)
             
             let alphaAnimation = CABasicAnimation(keyPath:"opacity")
             alphaAnimation.duration = 0.1
             alphaAnimation.toValue = NSNumber(value: 0 as Float)
-            alphaAnimation.fillMode = kCAFillModeForwards
+            alphaAnimation.fillMode = CAMediaTimingFillMode.forwards
             alphaAnimation.isRemovedOnCompletion = false
             arrowLayer.add(alphaAnimation, forKey:nil)
             highlightLayer.add(alphaAnimation, forKey:nil)
@@ -523,7 +523,7 @@ open class XBRefreshControl: UIControl {
             let alphaAnimation = CABasicAnimation(keyPath:"opacity")
             alphaAnimation.duration = 0.0001 
             alphaAnimation.toValue = NSNumber(value: 0 as Float)
-            alphaAnimation.fillMode = kCAFillModeForwards
+            alphaAnimation.fillMode = CAMediaTimingFillMode.forwards
             alphaAnimation.isRemovedOnCompletion = false
             shapeLayer.add(alphaAnimation, forKey: nil)
             arrowLayer.add(alphaAnimation, forKey: nil)
@@ -534,7 +534,7 @@ open class XBRefreshControl: UIControl {
             
             let offset = scrollView.contentOffset
             ignoreInset = true
-            scrollView.contentInset = UIEdgeInsetsMake(kOpenedViewHeight + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)
+            scrollView.contentInset = UIEdgeInsets(top: kOpenedViewHeight + self.originalContentInset.top, left: self.originalContentInset.left, bottom: self.originalContentInset.bottom, right: self.originalContentInset.right)
             ignoreInset = false
             scrollView.setContentOffset(offset, animated: false)
             
@@ -609,9 +609,9 @@ open class XBRefreshControl: UIControl {
         }
     }
     
-    open func setActivityIndicatorViewStyle(_ style: UIActivityIndicatorViewStyle) {
+    open func setActivityIndicatorViewStyle(_ style: UIActivityIndicatorView.Style) {
         if let activity = activity as? UIActivityIndicatorView {
-            activity.activityIndicatorViewStyle = style
+            activity.style = style
         }
     }
 }
